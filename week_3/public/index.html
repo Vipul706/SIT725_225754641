@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SIT 725 Prac 3</title>
+
+    <!-- Materialize CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
+    />
+
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+
+  <body>
+    <!-- NAVBAR -->
+    <nav>
+      <div class="nav-wrapper navbar-size">
+        <a href="#" class="brand-logo">
+          <!-- ✅ ONLINE IMAGE -->
+          <img
+            class="user-image-size"
+            src="https://images.unsplash.com/photo-1511367461989-f85a21fda167?w=200"
+          />
+        </a>
+      </div>
+    </nav>
+
+    <!-- MAIN -->
+    <main class="main-body">
+      <div class="container">
+        <!-- HEADER -->
+        <div class="row">
+          <div class="col s12 center-align">
+            <h1 id="heading">Welcome to SIT 725 Week 3</h1>
+            <p class="flow-text">
+              This is a demo application using Materialize
+            </p>
+          </div>
+
+          <!-- ✅ MAIN IMAGE -->
+          <div class="col s12 center-align">
+            <img
+              class="materialboxed materialboxed-image"
+              src="https://images.unsplash.com/photo-1503023345310-bd7c1de61c7d?w=800"
+            />
+          </div>
+
+          <!-- BUTTON -->
+          <div class="col s12 center-align">
+            <a
+              class="waves-effect waves-light btn click-me-button modal-trigger"
+              data-target="modal1"
+            >
+              <i class="material-icons left">auto_fix_high</i>
+              Click Me
+            </a>
+          </div>
+        </div>
+
+        <!-- DYNAMIC CARDS -->
+        <div class="row" id="card-section"></div>
+      </div>
+    </main>
+
+    <!-- MODAL -->
+    <div id="modal1" class="modal">
+      <div class="modal-content">
+        <h4>Form</h4>
+
+        <div class="input-field">
+          <input id="first_name" type="text" />
+          <label for="first_name">First Name</label>
+        </div>
+
+        <div class="input-field">
+          <input id="last_name" type="text" />
+          <label for="last_name">Last Name</label>
+        </div>
+
+        <div class="input-field">
+          <input id="email" type="email" />
+          <label for="email">Email</label>
+        </div>
+
+        <div class="center-align">
+          <a class="btn" id="formSubmit">Submit</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Materialize JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+    <!-- Custom JS -->
+    <script src="js/script.js"></script>
+  </body>
+</html>

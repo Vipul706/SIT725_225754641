@@ -1,0 +1,29 @@
+.navbar-size {
+  width: 95%;
+  margin: 0 auto;
+}
+
+nav .brand-logo {
+  display: flex;
+  align-items: center;
+}
+
+nav .brand-logo img {
+  height: 50px;
+}
+
+.main-body {
+  background-color: #f28487;
+  color: white;
+  height: calc(100vh - 64px);
+}
+
+.materialboxed-image {
+  margin: 0 auto;
+  height: 400px;
+}
+
+.click-me-button {
+  background-color: #ee6e73;
+  margin-top: 50px;
+}

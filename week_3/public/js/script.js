@@ -1,18 +1,20 @@
 const cardList = [
   {
-    title: 'Kitten 2',
-    image: 'https://images.unsplash.com/photo-1574158622682-e40e69881006?w=400',
+    title: 'Kitten 1',
+    image:
+      'https://img.freepik.com/free-photo/portrait-beautiful-purebred-pussycat-with-shorthair-orange-collar-neck-sitting-floor-reacting-camera-flash-scared-looking-light-indoor_8353-12551.jpg?semt=ais_hybrid&w=740&q=80',
     link: 'About Kitten 2',
     desciption: 'Cute kitten 2'
   },
   {
     title: 'Kitten 2',
-    image: 'https://images.unsplash.com/photo-1574158622682-e40e69881006?w=400',
+    image:
+      'https://plus.unsplash.com/premium_photo-1667030474693-6d0632f97029?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8Y2F0fGVufDB8fDB8fHww',
     link: 'About Kitten 2',
     desciption: 'Cute kitten 2'
   },
   {
-    title: 'Kitten 2',
+    title: 'Kitten 3',
     image: 'https://images.unsplash.com/photo-1574158622682-e40e69881006?w=400',
     link: 'About Kitten 2',
     desciption: 'Cute kitten 2'

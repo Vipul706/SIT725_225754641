@@ -27,3 +27,20 @@ nav .brand-logo img {
   background-color: #ee6e73;
   margin-top: 50px;
 }
+
+.card-image {
+  position: relative;
+  height: 365px;
+}
+
+.card .card-image img {
+  display: block;
+  border-radius: 2px 2px 0 0;
+  position: relative;
+  left: 0;
+  right: 0;
+  height: 100%;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+}

@@ -15,7 +15,11 @@
 
           data.forEach(book => {
             let li = document.createElement('li')
-            li.textContent = book.title + ' by ' + book.author
+
+            // Decimal128 fix
+            let price = book.price.$numberDecimal
+
+            li.textContent = book.title + ' by ' + book.author + ' - $' + price
             list.appendChild(li)
           })
         })

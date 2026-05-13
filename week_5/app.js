@@ -5,9 +5,9 @@ const booksRoutes = require('./routes/books.routes')
 const app = express()
 const PORT = 3000
 
+app.use(express.json())
 app.use(express.static('public'))
 app.use(booksRoutes)
-require('./seed')
 
 const startServer = async () => {
   try {
@@ -18,7 +18,7 @@ const startServer = async () => {
       console.log('Server running on port ' + PORT)
     })
   } catch (error) {
-    console.log('Database connection failed')
+    console.log('MongoDB connection failed')
     console.log(error)
   }
 }

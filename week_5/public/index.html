@@ -2,26 +2,86 @@
 <html>
   <head>
     <title>Books Catalog</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+
+      h1 {
+        color: #333;
+      }
+
+      .student-id {
+        margin-bottom: 20px;
+        font-weight: bold;
+      }
+
+      .book-card {
+        border: 1px solid #ccc;
+        padding: 12px;
+        margin-bottom: 12px;
+        border-radius: 6px;
+      }
+
+      .book-title {
+        font-size: 18px;
+        font-weight: bold;
+      }
+
+      .book-author {
+        color: #555;
+      }
+    </style>
   </head>
   <body>
-    <h1>Books List</h1>
-    <ul id="bookList"></ul>
+    <h1>Books Catalog</h1>
+    <p class="student-id">Developed by: 225754641</p>
+
+    <div id="bookList"></div>
 
     <script>
       fetch('/api/books')
         .then(res => res.json())
         .then(data => {
-          let list = document.getElementById('bookList')
+          const bookList = document.getElementById('bookList')
 
           data.forEach(book => {
-            let li = document.createElement('li')
+            const card = document.createElement('div')
+            card.className = 'book-card'
 
-            // Decimal128 fix
-            let price = book.price.$numberDecimal
+            const title = document.createElement('div')
+            title.className = 'book-title'
+            title.textContent = book.title
 
-            li.textContent = book.title + ' by ' + book.author + ' - $' + price
-            list.appendChild(li)
+            const author = document.createElement('div')
+            author.className = 'book-author'
+            author.textContent = 'Author: ' + book.author
+
+            const year = document.createElement('div')
+            year.textContent = 'Year: ' + book.year
+
+            const genre = document.createElement('div')
+            genre.textContent = 'Genre: ' + book.genre
+
+            const price = document.createElement('div')
+            price.textContent = 'Price: AUD $' + book.price.$numberDecimal
+
+            const summary = document.createElement('div')
+            summary.textContent = 'Summary: ' + book.summary
+
+            card.appendChild(title)
+            card.appendChild(author)
+            card.appendChild(year)
+            card.appendChild(genre)
+            card.appendChild(price)
+            card.appendChild(summary)
+
+            bookList.appendChild(card)
           })
+        })
+        .catch(error => {
+          console.log(error)
         })
     </script>
   </body>

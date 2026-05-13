@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Live Poll — Socket.IO</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:wght@400;500&display=swap");
+
+      :root {
+        --bg: #0d0d0d;
+        --surface: #161616;
+        --border: #2a2a2a;
+        --accent: #e8ff47;
+        --accent2: #ff6b35;
+        --text: #f0f0f0;
+        --muted: #666;
+        --green: #4ade80;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: "Syne", sans-serif;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 40px 20px;
+      }
+
+      /* Header */
+      header {
+        width: 100%;
+        max-width: 680px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 48px;
+      }
+
+      .logo {
+        font-size: 1rem;
+        font-weight: 800;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: var(--accent);
+      }
+
+      .status-pill {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 100px;
+        padding: 6px 14px;
+        font-family: "DM Mono", monospace;
+        font-size: 0.75rem;
+        color: var(--muted);
+      }
+
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--muted);
+        transition: background 0.3s;
+      }
+      .status-dot.connected {
+        background: var(--green);
+        box-shadow: 0 0 8px var(--green);
+        animation: pulse 2s infinite;
+      }
+      @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+      }
+
+      /* Main card */
+      .card {
+        width: 100%;
+        max-width: 680px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 48px;
+      }
+
+      .users-count {
+        font-family: "DM Mono", monospace;
+        font-size: 0.75rem;
+        color: var(--muted);
+        margin-bottom: 20px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+      }
+
+      .users-count span {
+        color: var(--accent);
+        font-weight: 500;
+      }
+
+      h1 {
+        font-size: clamp(1.4rem, 3vw, 2rem);
+        font-weight: 800;
+        line-height: 1.2;
+        margin-bottom: 36px;
+        color: var(--text);
+      }
+
+      /* Options */
+      .options {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-bottom: 32px;
+      }
+
+      .option-btn {
+        position: relative;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 18px 20px;
+        cursor: pointer;
+        text-align: left;
+        color: var(--text);
+        font-family: "Syne", sans-serif;
+        font-size: 1rem;
+        font-weight: 700;
+        overflow: hidden;
+        transition: border-color 0.2s, transform 0.1s;
+      }
+
+      .option-btn:hover:not(:disabled) {
+        border-color: var(--accent);
+        transform: translateY(-1px);
+      }
+
+      .option-btn:disabled {
+        cursor: default;
+      }
+
+      .option-btn.selected {
+        border-color: var(--accent);
+        background: rgba(232, 255, 71, 0.05);
+      }
+
+      /* Progress bar inside button */
+      .bar {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        background: rgba(232, 255, 71, 0.08);
+        width: 0%;
+        transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        border-radius: 12px;
+        pointer-events: none;
+      }
+
+      .option-content {
+        position: relative;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        z-index: 1;
+      }
+
+      .vote-pct {
+        font-family: "DM Mono", monospace;
+        font-size: 0.85rem;
+        color: var(--accent);
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+
+      .voted .vote-pct,
+      .results-visible .vote-pct {
+        opacity: 1;
+      }
+
+      /* Vote count label */
+      .vote-count {
+        font-family: "DM Mono", monospace;
+        font-size: 0.7rem;
+        color: var(--muted);
+        margin-top: 2px;
+      }
+
+      /* Actions */
+      .actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .btn-reset {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--muted);
+        font-family: "DM Mono", monospace;
+        font-size: 0.75rem;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        letter-spacing: 0.05em;
+        transition: border-color 0.2s, color 0.2s;
+      }
+      .btn-reset:hover {
+        border-color: var(--accent2);
+        color: var(--accent2);
+      }
+
+      /* Toast */
+      .toast {
+        position: fixed;
+        bottom: 32px;
+        left: 50%;
+        transform: translateX(-50%) translateY(80px);
+        background: var(--surface);
+        border: 1px solid var(--border);
+        color: var(--text);
+        padding: 12px 24px;
+        border-radius: 100px;
+        font-family: "DM Mono", monospace;
+        font-size: 0.8rem;
+        transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        z-index: 99;
+        white-space: nowrap;
+      }
+      .toast.show {
+        transform: translateX(-50%) translateY(0);
+      }
+      .toast.success { border-color: var(--green); color: var(--green); }
+      .toast.error   { border-color: var(--accent2); color: var(--accent2); }
+
+      /* Voted banner */
+      .voted-badge {
+        display: none;
+        align-items: center;
+        gap: 8px;
+        font-family: "DM Mono", monospace;
+        font-size: 0.75rem;
+        color: var(--green);
+        margin-bottom: 12px;
+      }
+      .voted-badge.visible { display: flex; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="logo">⚡ LivePoll</div>
+      <div class="status-pill">
+        <div class="status-dot" id="statusDot"></div>
+        <span id="statusLabel">Connecting…</span>
+      </div>
+    </header>
+
+    <div class="card" id="pollCard">
+      <div class="users-count">
+        <span id="userCount">0</span> user(s) online right now
+      </div>
+      <div class="voted-badge" id="votedBadge">✓ Your vote has been recorded</div>
+      <h1 id="pollQuestion">Loading poll…</h1>
+
+      <div class="options" id="optionsContainer"></div>
+
+      <div class="actions">
+        <button class="btn-reset" onclick="resetPoll()">↺ Reset Poll</button>
+      </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+      const socket = io();
+
+      let hasVoted = false;
+      let currentVotes = {};
+      let myChoice = null;
+
+      // --- Connection status ---
+      socket.on("connect", () => {
+        document.getElementById("statusDot").classList.add("connected");
+        document.getElementById("statusLabel").textContent = "Live";
+      });
+
+      socket.on("disconnect", () => {
+        document.getElementById("statusDot").classList.remove("connected");
+        document.getElementById("statusLabel").textContent = "Disconnected";
+      });
+
+      // --- User count ---
+      socket.on("users:count", (count) => {
+        document.getElementById("userCount").textContent = count;
+      });
+
+      // --- Receive full poll state on join ---
+      socket.on("poll:state", ({ question, options, votes, hasVoted: alreadyVoted }) => {
+        document.getElementById("pollQuestion").textContent = question;
+        currentVotes = { ...votes };
+        hasVoted = alreadyVoted;
+        renderOptions(options, votes);
+        if (hasVoted) showVotedState();
+      });
+
+      // --- Live vote updates from server ---
+      socket.on("poll:update", (votes) => {
+        currentVotes = { ...votes };
+        updateBars(votes);
+      });
+
+      // --- Server confirms OUR vote ---
+      socket.on("poll:voted", (option) => {
+        hasVoted = true;
+        myChoice = option;
+        showVotedState();
+        showToast(`Voted for ${option}!`, "success");
+        disableButtons();
+      });
+
+      // --- Poll reset ---
+      socket.on("poll:reset", (votes) => {
+        currentVotes = { ...votes };
+        hasVoted = false;
+        myChoice = null;
+        document.getElementById("votedBadge").classList.remove("visible");
+        document.getElementById("pollCard").classList.remove("voted");
+        enableButtons();
+        updateBars(votes);
+        showToast("Poll has been reset", "");
+      });
+
+      // --- Error ---
+      socket.on("poll:error", (msg) => {
+        showToast(msg, "error");
+      });
+
+      // --- Render option buttons ---
+      function renderOptions(options, votes) {
+        const container = document.getElementById("optionsContainer");
+        container.innerHTML = "";
+        options.forEach((opt) => {
+          const btn = document.createElement("button");
+          btn.className = "option-btn";
+          btn.id = `btn-${opt}`;
+          btn.onclick = () => castVote(opt);
+          btn.innerHTML = `
+            <div class="bar" id="bar-${opt}"></div>
+            <div class="option-content">
+              <div>
+                <div>${opt}</div>
+                <div class="vote-count" id="count-${opt}">0 votes</div>
+              </div>
+              <span class="vote-pct" id="pct-${opt}">0%</span>
+            </div>
+          `;
+          container.appendChild(btn);
+        });
+        updateBars(votes);
+      }
+
+      function totalVotes(votes) {
+        return Object.values(votes).reduce((a, b) => a + b, 0);
+      }
+
+      function updateBars(votes) {
+        const total = totalVotes(votes);
+        Object.entries(votes).forEach(([opt, count]) => {
+          const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+          const bar = document.getElementById(`bar-${opt}`);
+          const pctEl = document.getElementById(`pct-${opt}`);
+          const countEl = document.getElementById(`count-${opt}`);
+          if (bar) bar.style.width = pct + "%";
+          if (pctEl) pctEl.textContent = pct + "%";
+          if (countEl) countEl.textContent = `${count} vote${count !== 1 ? "s" : ""}`;
+        });
+      }
+
+      function castVote(option) {
+        if (hasVoted) return;
+        socket.emit("poll:vote", option);
+      }
+
+      function resetPoll() {
+        socket.emit("poll:reset");
+      }
+
+      function showVotedState() {
+        document.getElementById("votedBadge").classList.add("visible");
+        document.getElementById("pollCard").classList.add("voted");
+        disableButtons();
+        if (myChoice) {
+          const btn = document.getElementById(`btn-${myChoice}`);
+          if (btn) btn.classList.add("selected");
+        }
+      }
+
+      function disableButtons() {
+        document.querySelectorAll(".option-btn").forEach((b) => (b.disabled = true));
+      }
+
+      function enableButtons() {
+        document.querySelectorAll(".option-btn").forEach((b) => {
+          b.disabled = false;
+          b.classList.remove("selected");
+        });
+      }
+
+      // --- Toast helper ---
+      let toastTimer;
+      function showToast(msg, type = "") {
+        const toast = document.getElementById("toast");
+        toast.textContent = msg;
+        toast.className = `toast ${type} show`;
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => {
+          toast.classList.remove("show");
+        }, 3000);
+      }
+    </script>
+  </body>
+</html>
